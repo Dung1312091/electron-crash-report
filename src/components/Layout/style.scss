@@ -1,0 +1,24 @@
+.layout {
+  height: 100%;
+  padding: 10px;
+
+  &__header {
+    height: 60px;
+    width: 100%;
+
+    nav {
+      height: 100%;
+
+      a {
+        text-decoration: none;
+        margin-right: 20px;
+      }
+
+
+    }
+  }
+
+  &__content {
+    flex: 1;
+  }
+}
