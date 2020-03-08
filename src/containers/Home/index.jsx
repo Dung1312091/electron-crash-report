@@ -4,9 +4,9 @@ const { ipcRenderer } = electron;
 export default function Home() {
   const handleCrashByLogic = () => {
     ipcRenderer.send("asynchronous-message", "ping");
-    for (let i = 0; i < 100000; i++) {
-      console.log(i);
-    }
+    // for (let i = 0; i < 100000; i++) {
+    //   console.log(i);
+    // }
   };
   return (
     <div>

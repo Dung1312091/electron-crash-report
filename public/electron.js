@@ -76,7 +76,7 @@ app.on("activate", () => {
 
 ipcMain.on("asynchronous-message", () => {
   // process.crash()
-  // let a = null;
+  let a;
   // a.forEach(element => {
   //   console.log(element)
   // });
@@ -87,7 +87,10 @@ ipcMain.on("asynchronous-message", () => {
   // });
 
   // throw new Error('Run out of time');
-  console.log("aaaa")
+  a = [];
+  for (;;) {
+    a.push("hello");
+  }
 });
 electron.crashReporter.start({
   companyName: 'Demo',
@@ -107,9 +110,8 @@ process.on("uncaughtException", function (error, origin) {
   console.error("uncaughtException");
   logError(error);
   console.log("origin====>", origin);
-  process.crash()
 
-});
+})
 process.on("unhandledRejection", (error, origin) => {
   console.error("unhandledRejection");
   logError(error);
