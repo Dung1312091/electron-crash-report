@@ -94,6 +94,20 @@ ipcMain.on("error-by-logic", () => {
     return {};
   });
 });
+
+//error by logic
+ipcMain.on("error-by-logic", () => {
+  let a;
+  a.map(element => {
+    return {};
+  });
+});
+//error by not responding
+ipcMain.on("error-by-not-responding", () => {
+  for (let i = 0; i < 1000000000; i++) {
+    console.log(i);
+  }
+});
 // Catch Exception
 process.on("uncaughtException", function(error, origin) {
   console.error("uncaughtException");

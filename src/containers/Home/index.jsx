@@ -25,15 +25,32 @@ export default function Home() {
     //   console.log(i);
     // }
   };
+  const handleNotResponding = () => {
+    ipcRenderer.send("error-by-not-responding");
+    // for (let i = 0; i < 100000; i++) {
+    //   console.log(i);
+    // }
+  };
+
   const handleErrorByLogicRenderer = () => {
     let a;
-    a.forEach(element => {
-      console.log(element);
+    a.map(element => {
+      return {};
     });
   };
   const handleRendererCrash = () => {
-    crashWithWhileScreen();
-    // remote.process.crash();
+    let a = [];
+    for (;;) {
+      a.push("crash");
+    }
+  };
+
+  const handleLoopInfinity = () => {
+    let arr = [];
+    for (let i = 0; i < 1000000000; i++) {
+      arr.push("crash");
+    }
+    console.log(arr);
   };
   return (
     <div>
@@ -41,10 +58,13 @@ export default function Home() {
       <button onClick={handleErrorByLogicMain}>
         Error By Logic On Main Process
       </button>
+      <button onClick={handleNotResponding}>Not Responding</button>
+
       <button onClick={handleErrorByLogicRenderer}>
-        Error By Logic On Renderer Process
+        Error By NULL OR UNDIFINE On Renderer Process
       </button>
       <button onClick={handleRendererCrash}>Renderer Crash</button>
+      <button onClick={handleLoopInfinity}>Loop Infinity</button>
     </div>
   );
 }
