@@ -3,12 +3,15 @@ const {
   app,
   BrowserWindow,
   ipcMain,
-  globalShortcut,
+  globalShortcut
 } = electron;
 const peocessElectron = electron.process;
 const path = require("path");
 const isDev = require("electron-is-dev");
 const debug = require("electron-debug");
+const {
+  reportToServer
+} = require("./crashReport");
 isDev && debug();
 let mainWindow;
 
@@ -21,20 +24,34 @@ function somePromise() {
 }
 
 function logError(error) {
-  if (typeof error === 'object') {
+  if (typeof error === "object") {
     if (error.message) {
-      console.log('\nMessage: ' + error.message)
+      console.log("\nMessage: " + error.message);
     }
     if (error.stack) {
-      console.log('\nStacktrace:')
-      console.log('====================')
+      console.log("\nStacktrace:");
+      console.log("====================");
       console.log(error.stack);
       console.log(error.code);
     }
   } else {
-    console.log('Argument is not an object', error);
+    console.log("Argument is not an object", error);
   }
 }
+//set up crash report
+electron.crashReporter.start({
+  companyName: "Demo",
+  productName: "my-electron-crasher",
+  submitURL: "http://localhost:3001/crash-report",
+  // ignoreSystemCrashHandler: true,
+  uploadToServer: true,
+  autoSubmit: true
+  // extra: {
+  //   'key': 'en-US',
+  //   'email': 'quangdung100194@gmail.com',
+  //   'comments': 'Crash app!'
+  // }
+});
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -51,20 +68,16 @@ function createWindow() {
     `file://${path.join(__dirname, "../build/index.html")}`
   );
   mainWindow.on("closed", () => (mainWindow = null));
-  const ret = globalShortcut.register("CommandOrControl+X", () => {
-    console.log("CommandOrControl+X is pressed");
+
+  mainWindow.webContents.on('crashed', e => {
+    console.log("crashed===>", e);
+    app.relaunch();
+    // app.quit()
   });
-
-  if (!ret) {
-    console.log("registration failed");
-  }
-
-  // Check whether a shortcut is registered.
-  console.log(globalShortcut.isRegistered("CommandOrControl+X"));
 }
 app.on("ready", createWindow);
 app.on("window-all-closed", () => {
-  if (peocessElectron.platform !== "darwin") {
+  if (process.platform !== "darwin") {
     app.quit();
   }
 });
@@ -73,47 +86,38 @@ app.on("activate", () => {
     createWindow();
   }
 });
-
-ipcMain.on("asynchronous-message", () => {
-  // process.crash()
-  let a;
-  // a.forEach(element => {
-  //   console.log(element)
-  // });
-  // somePromise().then(res => {
-  //   for (let i = 0; i < 1000000; i++) {
-  //     console.log(i);
-  //   }
-  // });
-
-  // throw new Error('Run out of time');
-  a = [];
+//crash app
+ipcMain.on("crash-app", () => {
+  let a = [];
   for (;;) {
-    a.push("hello");
+    a.push("crash");
   }
 });
-electron.crashReporter.start({
-  companyName: 'Demo',
-  productName: 'my-electron-crasher',
-  submitURL: 'http://localhost:3001/crash-report',
-  // ignoreSystemCrashHandler: true,
-  uploadToServer: true,
-  autoSubmit: true,
-  // extra: {
-  //   'key': 'en-US',
-  //   'email': 'quangdung100194@gmail.com',
-  //   'comments': 'Crash app!'
-  // }
-})
+
+//error by logic
+ipcMain.on("error-by-logic", () => {
+  let a;
+  a.map(element => {
+    return {};
+  });
+});
 // Catch Exception
 process.on("uncaughtException", function (error, origin) {
   console.error("uncaughtException");
   logError(error);
   console.log("origin====>", origin);
-
-})
+  reportToServer("http://localhost:3001/bugs", {
+    error: error.stack
+  });
+});
 process.on("unhandledRejection", (error, origin) => {
   console.error("unhandledRejection");
   logError(error);
   console.log("origin====>", origin);
+});
+
+app.on('renderer-process-crashed', function (event, webContents, killed) {
+  console.log('renderer-process-crashed', event);
+  console.log('webContents', webContents);
+  console.log('killed', killed);
 });
