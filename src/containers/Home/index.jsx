@@ -1,7 +1,20 @@
 import React from "react";
 import { crashWithWhileScreen } from "../../scripts/crashWithWhileScreen";
 const electron = window.require("electron");
-const { ipcRenderer } = electron;
+const { ipcRenderer, remote } = electron;
+electron.crashReporter.start({
+  companyName: "Demo",
+  productName: "my-electron-crasher",
+  submitURL: "http://localhost:3001/crash-report",
+  ignoreSystemCrashHandler: true,
+  uploadToServer: true,
+  autoSubmit: true
+  // extra: {
+  //   'key': 'en-US',
+  //   'email': 'quangdung100194@gmail.com',
+  //   'comments': 'Crash app!'
+  // }
+});
 export default function Home() {
   const handleCrashApp = () => {
     ipcRenderer.send("crash-app");
@@ -20,6 +33,7 @@ export default function Home() {
   };
   const handleRendererCrash = () => {
     crashWithWhileScreen();
+    // remote.process.crash();
   };
   return (
     <div>

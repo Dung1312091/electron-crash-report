@@ -1,17 +1,10 @@
 const electron = require("electron");
-const {
-  app,
-  BrowserWindow,
-  ipcMain,
-  globalShortcut
-} = electron;
+const { app, BrowserWindow, ipcMain, globalShortcut } = electron;
 const peocessElectron = electron.process;
 const path = require("path");
 const isDev = require("electron-is-dev");
 const debug = require("electron-debug");
-const {
-  reportToServer
-} = require("./crashReport");
+const { reportToServer } = require("./crashReport");
 isDev && debug();
 let mainWindow;
 
@@ -43,7 +36,7 @@ electron.crashReporter.start({
   companyName: "Demo",
   productName: "my-electron-crasher",
   submitURL: "http://localhost:3001/crash-report",
-  // ignoreSystemCrashHandler: true,
+  ignoreSystemCrashHandler: true,
   uploadToServer: true,
   autoSubmit: true
   // extra: {
@@ -63,17 +56,17 @@ function createWindow() {
   });
 
   mainWindow.loadURL(
-    isDev ?
-    "http://localhost:3000" :
-    `file://${path.join(__dirname, "../build/index.html")}`
+    isDev
+      ? "http://localhost:3000"
+      : `file://${path.join(__dirname, "../build/index.html")}`
   );
   mainWindow.on("closed", () => (mainWindow = null));
 
-  mainWindow.webContents.on('crashed', e => {
-    console.log("crashed===>", e);
-    app.relaunch();
-    // app.quit()
-  });
+  // mainWindow.webContents.on('crashed', e => {
+  //   console.log("crashed===>", e);
+  //   app.relaunch();
+  //   // app.quit()
+  // });
 }
 app.on("ready", createWindow);
 app.on("window-all-closed", () => {
@@ -102,7 +95,7 @@ ipcMain.on("error-by-logic", () => {
   });
 });
 // Catch Exception
-process.on("uncaughtException", function (error, origin) {
+process.on("uncaughtException", function(error, origin) {
   console.error("uncaughtException");
   logError(error);
   console.log("origin====>", origin);
@@ -116,8 +109,8 @@ process.on("unhandledRejection", (error, origin) => {
   console.log("origin====>", origin);
 });
 
-app.on('renderer-process-crashed', function (event, webContents, killed) {
-  console.log('renderer-process-crashed', event);
-  console.log('webContents', webContents);
-  console.log('killed', killed);
+app.on("renderer-process-crashed", function(event, webContents, killed) {
+  console.log("renderer-process-crashed", event);
+  console.log("webContents", webContents);
+  console.log("killed", killed);
 });
